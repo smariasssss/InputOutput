@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         int[] prices = {40, 200, 60};
         String[] productsName = {"Хлеб", "Масло", "Щоколадка"};
@@ -30,7 +30,7 @@ public class Main {
             basket.saveTxt(new File("basket.txt"));
         }
 
-        Basket basket2 = Basket.loadFromTxtFile(new File("basket.txt"));
+        Basket basket2 = Basket.loadFromBinFile(new File("basket.bin"));
 
         basket.printCart();
     }

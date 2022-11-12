@@ -63,39 +63,6 @@ public class Basket implements Serializable {
         }
     }
 
-    public static Basket loadFromTxtFile(File textFile) throws IOException {
-
-        try (Scanner scanner = new Scanner(textFile);) {
-            int size = Integer.parseInt(scanner.nextLine());
-
-            String[] productsName = new String[size];
-            String[] productsParts = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < productsName.length; i++) {
-                productsName[i] = productsParts[i];
-            }
-
-            int[] prices = new int[size];
-            String[] pricesParts = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < pricesParts.length; i++) {
-                prices[i] = Integer.parseInt(pricesParts[i]);
-            }
-
-            int[] counts = new int[size];
-            String[] countsParts = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < countsParts.length; i++) {
-                counts[i] = Integer.parseInt(countsParts[i]);
-            }
-
-            Basket basket = new Basket();
-            basket.productsName = productsName;
-            basket.prices = prices;
-            basket.productsCount = counts;
-
-            return basket;
-        }
-
-    }
-
     public void saveBin(File binFile) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(binFile))) {
             out.writeObject(this);
