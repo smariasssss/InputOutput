@@ -1,100 +1,94 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.simple.parser.JSONParser;
 
-public class Basket {
+import java.io.*;
+import java.text.ParseException;
 
+public class Basket implements Serializable {
     private int[] prices;
-    private String[] productsName;
-    private int[] productsCount;
+    private String[] products;
+    private int[] totalBasket;
+    private int sum;
+    private boolean[] isFilled;
 
-    private Basket() {
 
-    }
-
-    public Basket(int[] prices, String[] productsName) {
+    public Basket(int[] prices, String[] products) {
         this.prices = prices;
-        this.productsCount = new int[prices.length];
-        this.productsName = productsName;
+        this.products = products;
+        this.totalBasket = new int[products.length];
+        this.isFilled = new boolean[products.length];
     }
 
-    public void setProductsCount(int[] productsCount) {
-        this.productsCount = productsCount;
+    public Basket(int[] prices, String[] products, int[] totalBasket, boolean[] isFilled) {
+        this.prices = prices;
+        this.products = products;
+        this.totalBasket = totalBasket;
+        this.isFilled = isFilled;
     }
 
-    protected void addToCart(int productNum, int amount) {
-        productsCount[productNum] += amount;
+    public Basket(int[] prices, String[] products, int[] totalBasket, int sum, boolean[] isFilled) {
+        this.prices = prices;
+        this.products = products;
+        this.totalBasket = totalBasket;
+        this.sum = sum;
+        this.isFilled = isFilled;
+    }
+
+    public Basket() {
+    }
+
+
+    public void addToCart(int productNum, int amount) {
+        totalBasket[productNum] += amount;
+
+        isFilled[productNum] = true;
     }
 
     public void printCart() {
-        System.out.println("Корзина:");
-
-        int sum = 0;
-
-        for (int i = 0; i < productsCount.length; i++) {
-            int allCount = productsCount[i];
-            int priceSum = prices[i] * allCount;
-            if (allCount > 0) {
-                sum += priceSum;
-                System.out.println(productsName[i] + " " + allCount + " " + priceSum);
+        for (int i = 0; i < products.length; i++) {
+            if (isFilled[i]) {
+                System.out.println("You chose " + products[i] + ", " + totalBasket[i] + " items;" +
+                        "price = " + prices[i] * totalBasket[i]);
+                sum += prices[i] * totalBasket[i];
             }
         }
-        System.out.println("Всего: " + sum + " руб.");
+        System.out.println("Total price = " + sum);
     }
 
     public void saveTxt(File textFile) throws IOException {
-        try (PrintWriter writer = new PrintWriter(textFile);) {
-            writer.println(productsName.length);
+        textFile = new File(textFile.toURI());
+        try (PrintWriter out = new PrintWriter(textFile)) {
+            for (int i = 0; i < totalBasket.length; i++) {
 
-            String productsLine = Arrays.stream(productsName)
-                    .collect(Collectors.joining(" "));
-            writer.println(productsLine);
-
-            for (int price : prices) {
-                writer.print(price + " ");
+                out.print(totalBasket[i] + " ");
             }
-            writer.println();
-
-            for (int count : productsCount) {
-                writer.print(count + " ");
+            out.println();
+            for (int j = 0; j < totalBasket.length; j++) {
+                out.print(products[j] + " ");
             }
-            writer.println();
+            out.println();
+            for (int t = 0; t < prices.length; t++) {
+                out.print(prices[t] + " ");
+            }
+            out.println();
+            for (int t = 0; t < isFilled.length; t++) {
+                out.print(isFilled[t] + " ");
+            }
         }
     }
 
-    public static Basket loadFromTxtFile(File textFile) throws IOException {
+    public static Basket loadFromTxtFile(File textFile) throws IOException, ParseException, org.json.simple.parser.ParseException {
 
-        try (Scanner scanner = new Scanner(textFile);) {
-            int size = Integer.parseInt(scanner.nextLine());
-
-            String[] productsName = new String[size];
-            String[] productsParts = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < productsName.length; i++) {
-                productsName[i] = productsParts[i];
-            }
-
-            int[] prices = new int[size];
-            String[] pricesParts = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < pricesParts.length; i++) {
-                prices[i] = Integer.parseInt(pricesParts[i]);
-            }
-
-            int[] counts = new int[size];
-            String[] countsParts = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < countsParts.length; i++) {
-                counts[i] = Integer.parseInt(countsParts[i]);
-            }
-
-            Basket basket = new Basket();
-            basket.productsName = productsName;
-            basket.prices = prices;
-            basket.productsCount = counts;
-
-            return basket;
+        JSONParser parser = new JSONParser();
+        if (textFile.exists()) {
+            ObjectMapper mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            Object obj = parser.parse(new FileReader(textFile));
+            String result = mapper.writeValueAsString(obj);
+            return mapper.readValue(result, Basket.class);
+        } else {
+            return new Basket(null, null, null, null);
         }
-
     }
 }
