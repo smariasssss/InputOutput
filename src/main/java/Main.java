@@ -2,7 +2,6 @@ import org.w3c.dom.Document;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.json.simple.parser.ParseException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -21,14 +20,14 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         int[] newProducts = new int[]{40, 200, 60};
-        String[] newNameOfProducts = new String[]{"Хлеб", "Масло", "Щоколадка"};
+        String[] newNameOfProducts = new String[]{"Хлеб", "Масло", "Шоколадка"};
         Basket basket = new Basket(newProducts, newNameOfProducts);
         File csvFile = new File("log.csv");
         File jsonFile = new File("basket.json");
         File xmlFile = new File("shop.xml");
         ClientLog log = new ClientLog();
-        basket.addToCart(3, 10);
         basket.addToCart(1, 2);
+        basket.addToCart(2, 3);
         basket.printCart();
 
         GsonBuilder builder1 = new GsonBuilder();
@@ -42,13 +41,13 @@ public class Main {
         }
         File file = new File("basket.json");
         Basket basket1 = Basket.loadFromTxtFile(file);
-        basket1.addToCart(2, 2);
+        basket1.addToCart(2, 1);
         basket1.printCart();
 
         ClientLog allLog = new ClientLog();
-        allLog.log(4, 5);
+        allLog.log(1, 5);
         allLog.log(3, 6);
-        allLog.log(4, 3);
+        allLog.log(2, 3);
         allLog.exportAsCSV(new File("log.csv"));
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

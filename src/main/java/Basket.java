@@ -49,12 +49,12 @@ public class Basket implements Serializable {
     public void printCart() {
         for (int i = 0; i < products.length; i++) {
             if (isFilled[i]) {
-                System.out.println("You chose " + products[i] + ", " + totalBasket[i] + " items;" +
-                        "price = " + prices[i] * totalBasket[i]);
+                System.out.println("Корзина: " + products[i] + ", " + totalBasket[i] + " штук; " +
+                        "цена = " + prices[i] * totalBasket[i]);
                 sum += prices[i] * totalBasket[i];
             }
         }
-        System.out.println("Total price = " + sum);
+        System.out.println("Всего = " + sum);
     }
 
     public void saveTxt(File textFile) throws IOException {
